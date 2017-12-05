@@ -56,3 +56,72 @@ La crittografia viene principalmente utilizzata per provare che un certo account
 
 Ogni account bitcoin ha una chiave pubblica (l'indirizzo stesso dell'account bitcoin) e una chiave privata. Tramite la chiave privata un account può provare di voler spendere un certo input (digital signature). Questa prova della volontà di spendere un certo input viene salvata nei blocchi minati.
 
+In bitcoin usa elliptic curve multiplication come base crittografica (ECC).
+
+ECC si basa su una così detta trapdoor function (funzione a botola). Cos'è una trapdoor function?
+
+RSA ad esempio si basa sulla fattorizzazione del prodotto di due numeri primi (altro esempio di trapdoor function).
+
+### ECC vs RSA
+
+Per ottenere lo stesso livello di sicurezza che si ha con una chiave privata da 256 bit usando la trapdoor function di ECC in RSA, occorre utilizzare una chiave segreta di 3072 bit.
+
+384 bit ECC == 7680 bit in RSA (cresce più che linearmente la dimensione della chiave RSA).
+
+Quindi con ECC stesso livello di sicurezza di RSA, con una chiave privata più piccola.
+
+https://www.youtube.com/watch?v=F3zzNa42-tQ
+
+In bitcoin quindi c'è:
+- chiave pubblica (usata per ricevere fondi)
+- chiave privata: usata per firmare le transazioni in cui si spendono fondi
+
+Ogni volta che si effettua una transazione, l'account owner presenta la sua public key e una signature che è diversa ogni volta, ma che viene sempre generata dalla stessa chiave privata.
+
+Un wallet bitcoin contiene un insieme di coppie di chiavi, ognuna costituita da una chiave privata e una pubblica. La chiave privata è un numero, generalmente ottenuto in maniera randomica. Dalla chiave privata, ovvero un numero, eseguiamo la elliptic curve multiplication. Una trapdoor function. 
+
+
+Riassumendo:
+
+1. beta: Genero un numero random di 256 bit, ovvero un numero tra 1 e 2^256-1 (Chiave privata)
+2. Lo standard ha un punto generatore detto G
+3. Applico la moltiplicazione scalare e ottengo la chiave pubblica:
+B = beta * G
+
+L'operazione 3 è facilmente calcolabile, ma difficilmente invertibile. Ovvero avendo B e G (noti a un eventuale utente malevolo), risulta molto difficile ricavare beta.
+
+Come utilizzano ECC Alice e Bob?
+
+Alice
+1. Genera alpha
+2. Calcola A = alpha * G
+3. Invia in chiaro A a Bob
+
+Bob
+1. Genera beta
+2. Calcola B = beta * G
+3. Invia in chiaro B ad Alice
+
+Alice
+4. Riceve B da Bob
+5. Si calcola il prodotto scalare di P = alpha*(beta*G)
+Chiaramente Alice non ha beta, ma tanto a lui serve beta*G, ovvero B e questo è un valore che effettivamente possiede. Quindi di fatto cioò che fa è:
+P = alpha*B
+
+Bob
+4. Riceve A da Alice
+5. Si calcola il prodotto scalare di P = beta*(alpha*G) = beta*B
+
+
+P è un segreto condiviso da Alice e Bob
+
+Un possibile utente malevolo possiede:
+G
+A -> non può ricavare facilmente alpha
+B -> non può ricavare facilmente beta
+
+Ma non potrà mai calcolare P, perché non possiede e non può calcolare facilmente alpha o beta.
+
+
+L'hash di A e B corrispondono agli indirizzi pubblici di Alice e Bob.
+
