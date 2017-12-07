@@ -159,10 +159,41 @@ Se A vuole pagare 0.2 BTC a B, dovrà spedire 0.2 BTC a B e 1 BTC a se stesso. Q
 
 L'unica eccezione alla chain di input e output è rappresentata dalla coinbase, un output particolare, che sta in cima a ogni blocco minato e che rappresenta il reward del miner. 
 
-Le transazioni quando devono essere trasmesse sul network vengono serializzate.
-
-Il formato di serializzazione è il seguente:
+Gli output delle transazioni quando devono essere trasmesse sul network vengono serializzate. Il formato di serializzazione è il seguente:
 
 1. Amount in satoshi (10^-8) 8 bytes (little-endian)
 ![alt text](https://cdn-images-1.medium.com/max/1500/1*XzLlyZSuMyVCEOGaUh2hFg.png "Little-Endian")
+
+2. Locking-Script size 1-9 bytes (VarInt): la dimensione del Locking-Script in bytes
+
+3. Locking-Script (dimensione variabile): uno script che viene eseguito per verificare che un certo output sia spendibile.
+
+
+Gli input identificato quale UTXO si sta consumando o forniscono una prova della proprietà di quell'output fornendo un unlocking script.
+
+
+Ora vediamo come è strutturata un input nel dettaglio:
+
+- (txid, vout) questo è un pointer all'UTXO di riferimento, quindi all'output che si desidera spendere. In particolare ci sono due campi: txid è l'id della transazione che contiene l'UTXO speso, mentre il vout è un indice che indica a quale output ci si riferisce. Se vout = 0 significa che ci si riferisce al primo
+- scriptSig: questo è l'unlocking script, che spesso rappresenta una firma digitale che prova la proprietà dell'output. In realtà può avere anche un contenuto diverso.
+- numero di sequenza (visto più in la)
+
+
+Guardando all'input è possibile notare che c'è solo un puntatore a un UTXO, ma non la quantità di satoshi effettivamente legata ad essa. Questo significa che ogni nodo che riceverà questa transazione, dovrà andarsi a cercare la transazione di riferimento, per poter validare la transazione. Validare la transazione significa verificare che l'output sia minore dell'input e che il locking script sia stato risolto correttamente.
+
+Le transazioni includono delle fee. Le fee esistono per due motivi:
+- ricompensare i miners di rendere sicuro il network
+- evitare attacchi in cui si innona il network di transazioni
+
+Generalmente le fee sono calcolate automaticamente dal wallet e sono aggiunte automaticamente. Se invece stai costruendo una transazione "a mano", allora dovrai includere autonomamente le fees. Le transaction fee sono calcolate sulla base della grandezza in kilobytes, non in base al valore che trasportano in bitcoin.
+
+Quanto si pagano le fees? In realtà il costo delle fee varia e dipende dal mercato (domanda (transazioni richieste), offerta (miners disponibili a minare)).
+
+I miner a loro volta danno una maggiore priorità alle transazioni che hanno un maggior quantitativo di fee. Si capisce quindi che in realtà le fee non sono obbligatorie, in teoria una transazione può essere minata anche con 0 fee. Il problema è che sono poche le speranze per cui una transazione con 0 fee venga propagata nel network e poi effettivamente minata.
+
+In bitcoin core il minimo di fee richiesta è 0.00001 (1 millibitcoin) per kilobyte.
+
+Questo significa che le transazioni con fee minore a 1millibitcoin vengono generalmente scartate, o al limite aggiunte se c'è spazion nel mempool.
+
+Detto questo, ciò che fanno i wallet è appoggiarsi a servizi di terzi, che gli dicono qual è il prezzo medio delle fee per kilobyte e a quel punto propongono una fee adeguata alla transazione da voler effettuare in quel momento.
 
