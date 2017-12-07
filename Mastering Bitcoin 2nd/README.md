@@ -125,3 +125,44 @@ Ma non potrà mai calcolare P, perché non possiede e non può calcolare facilme
 
 L'hash di A e B corrispondono agli indirizzi pubblici di Alice e Bob.
 
+
+## Capitolo 5
+Esistono due tipi di wallet:
+
+Non deterministici: ogni wallet ha una chiave privata generata in maniera randomica
+Deterministici: c'è un seed e da questo seed si generano le chiavi di tutti i wallet in maniera deterministica
+
+Questa seconda scelta è migliore, perché mentre nel primo tipo di wallet il backup è più complesso (più chiavi di cui effettuare il backup), nella seconda tipologia basta effettuare il backup del seed.
+
+Dei wallet deterministici ne esistono varie tipologie, una delle più famose è la cosidetta HD (Hierarchical Deterministic) Wallet (BIP-32/BIP-44).
+
+Negli HD Wallet c'è un seed e poi un insieme di key derivate da una struttura ad albero. In questa struttura ad albero una parent key può usare i wallet figli. Questo garantisce una serie di vantaggi, in particolar modo per quanto riguarda la gestione e la privacy.
+
+Perché la privacy migliora? Perché in questo modo per ogni transazione è possibile generare una nuova chiave pubblica
+
+## Capitolo 6
+
+set UTXO: tutti gli output ancora non spesi
+
+Ogni transazione rappresenta un cambiamento del set UTXO
+
+Dire che un wallet ha ricevuto dei bitcoin non ha senso. Ha più senso dire che un wallet ha rilevato nella block chain un output non speso che è utilizzabile con una delle chiavi private gestite dal wallet.
+
+In questo senso il totale di un wallet non è altro che la somma di tutte le UTXO utilizzabili mediante le chiavi private del wallet.
+
+Una caratteristica essenziale degli output è che sono indivisibili. Ovvero se un wallet ha due output spendibili:
+1.2 BTC
+0.8 BTC
+Allora questi due output non possono essere divisi.
+
+Se A vuole pagare 0.2 BTC a B, dovrà spedire 0.2 BTC a B e 1 BTC a se stesso. Questo meccanismo è nascosto dal wallet, non dal protocollo.
+
+L'unica eccezione alla chain di input e output è rappresentata dalla coinbase, un output particolare, che sta in cima a ogni blocco minato e che rappresenta il reward del miner. 
+
+Le transazioni quando devono essere trasmesse sul network vengono serializzate.
+
+Il formato di serializzazione è il seguente:
+
+1. Amount in satoshi (10^-8) 8 bytes (little-endian)
+![alt text](https://cdn-images-1.medium.com/max/1500/1*XzLlyZSuMyVCEOGaUh2hFg.png "Little-Endian")
+
