@@ -283,5 +283,26 @@ Ovvero, in uno schema 2-of-3 significa che ci sono 3 chiavi private e che si dev
 A che cosa può servire questa cosa qui, vedi video:
 https://www.youtube.com/watch?v=yeLqe_gg2u0
 
+In bitcoin è possibile definire anche che un output possa essere sbloccato in relazione al tempo.
 
-## Capitolo 8
+In particolare nelle transazioni c'è un campo, detto nLocktime. Questo campo indica quando la transazione può essere considerata valida dal network. Generalmente è impostata a 0, ovvero generalmente ogni transazione si vuole sia valida immediatamente.
+
+Se nlocktime è un numero differente da zero e sotto il valore di 500 milioni, esso viene interpretato come un block height. Ovvero quella transazione sarà valida solo da un certo blocco in poi. Se invece il valore è maggiore di 500 milioni, allora viene interpretato come un UNIX Epoch timestamp e questo significa che una transazione non è valida prima di una certa data.
+
+C'è un problema però, nlocktime ha un limite, vediamolo con un esempio.
+
+Alice girma una transazione in cui spende uno dei suoi output con Bob e setta il transaction nlocktime a tre mesi nel futuro. Con questa transazione:
+
+- Bob non può trasmettere la transazione prima dei tre mesi
+- Bob può trasmettere la transazione dopo 3 mesi
+
+Tuttavia Alice può creare un'altra transazione, in cui spende lo stesso output senza un locktime. Quindi alice può spendere lo stesso input prima che siano passati i tre mesi. Bob non ha nessuna garanzia che Alice possa realmente fare questo.
+
+Per garantire a Bob questo è necessario la restrizione del timelock deve essere posizionata all'interno della UTXO ed essere parte del locking script, invece che nella transazione. Questo è possibile con la prossima forma di timelock, la Check Lock Time Verify (CLTV).
+
+### CLTV
+Nel 2015 una nuova forma di timelock è stata introdotta, denominata CHECKLOCKTIMEVERIFY, che è un comando aggiunto nel linguaggio Script. Con CLTV è possibile definire un timelock per l'output e non per la transazione. In questo modo cio che accade è questo. La transazione avviene in maniera immediata, ma l'output può essere speso solo in una certa data futura.
+
+### Relative Timelocks
+Sia nLockTime che CLTV rappresentano dei timelocks assoluti, ovvero che identificano un certo istante temporale preciso nel futuro. Adesso invece vediamo due timelock relativi.
+
