@@ -283,6 +283,9 @@ Ovvero, in uno schema 2-of-3 significa che ci sono 3 chiavi private e che si dev
 A che cosa può servire questa cosa qui, vedi video:
 https://www.youtube.com/watch?v=yeLqe_gg2u0
 
+
+### Transazioni e tempo
+
 In bitcoin è possibile definire anche che un output possa essere sbloccato in relazione al tempo.
 
 In particolare nelle transazioni c'è un campo, detto nLocktime. Questo campo indica quando la transazione può essere considerata valida dal network. Generalmente è impostata a 0, ovvero generalmente ogni transazione si vuole sia valida immediatamente.
@@ -306,3 +309,9 @@ Nel 2015 una nuova forma di timelock è stata introdotta, denominata CHECKLOCKTI
 ### Relative Timelocks
 Sia nLockTime che CLTV rappresentano dei timelocks assoluti, ovvero che identificano un certo istante temporale preciso nel futuro. Adesso invece vediamo due timelock relativi.
 
+Relative timelocks sono utili perché permettono permettono di realizzare una catena di due o più transazioni fuori dalla blockchain (offchain), imponendo ad esempio una costrizione di una transazione che dipende dal tempo passato dalla conferma di una precedente transazione. In altre parole l'orologio non scatta fin tanto che una certa UTXO non sia stata registrata sulla blockchain. Questa funzionalità è particolarmente utile nei bidirectional state channels e nel Lightning Network.
+
+### Relative Timelocks with CSV
+Come in CLTV and nLocktime, c'è uno script opcode per i relative timelocks. Questo opcode è detto CHECKSEQUENCEVERIFY. Questo opcode permette di spendere un output solo in una transazione il cui numero nSequence sia maggiore a una certa soglia.
+
+Relative timelocks con i csv sono utili quando una catena di transazioni sono create e firmate, ma non propagate. In questo modo una transazione figlia non può essere spesa fin tanto che quella padre non è stata minata.
