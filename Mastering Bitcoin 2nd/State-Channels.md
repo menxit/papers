@@ -86,10 +86,11 @@ Vediamo il funzionamento dello script passo passo:
 6. <PUBLIC_KEY_3>: fa il push sullo stack di <PUBLIC_KEY_3>
 7. 3: fa il push sullo stack di 3
 8. CHECKMULTISIG
-8.1. Effettua il pop dell'item che affiora sullo stack, ovvero N (in questo caso equivale a 3)
-8.2. Dopo effettua il pop di N elementi, dunque le 3 public key
-8.3. Dopo effettua il pop di M, ovvero il quorum necessario, che in questo caso è pari a 2
-8.4. A questo punto occorre fare il pop degli ultimi 2 PUBLIC_KEY forniti, ma a causa di questo bug in realtà si effettuerà il pop di 3 elementi. Per questo deve essere presente un ulteriore elemento, altrimenti si fa il pop su uno stack vuoto e si restituire un errore. Questo ulteriore valore può essere qualunque cosa, generalmente si opta per lo 0.
+	
+	- Effettua il pop dell'item che affiora sullo stack, ovvero N (in questo caso equivale a 3)
+	- Dopo effettua il pop di N elementi, dunque le 3 public key
+	- Dopo effettua il pop di M, ovvero il quorum necessario, che in questo caso è pari a 2
+	- A questo punto occorre fare il pop degli ultimi 2 PUBLIC_KEY forniti, ma a causa di questo bug in realtà si effettuerà il pop di 3 elementi. Per questo deve essere presente un ulteriore elemento, altrimenti si fa il pop su uno stack vuoto e si restituire un errore. Questo ulteriore valore può essere qualunque cosa, generalmente si opta per lo 0.
 
 
 ### Pay-to-Script-Hash (P2PSH)
