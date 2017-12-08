@@ -197,3 +197,76 @@ Questo significa che le transazioni con fee minore a 1millibitcoin vengono gener
 
 Detto questo, ciò che fanno i wallet è appoggiarsi a servizi di terzi, che gli dicono qual è il prezzo medio delle fee per kilobyte e a quel punto propongono una fee adeguata alla transazione da voler effettuare in quel momento.
 
+### Script
+Script è un linguaggio di programmazione turing non completo utilizzato per realizzare sia i locking script che gli unlocking script che si trovano nella UTXO.
+
+Attualmente la maggior pare delle transazioni processate tramite il network bitcoin hanno la forma di "Pagamento all'address di Bob" e questo è realizzabile con un particolare script che prende il nome di Pay-To-Public-Key-Hash script. Tuttavia con bitcoin non è possibile effettuare semplicemente un pagamento a Bob. 
+
+Infatti i locking script possono essere arbitrariamente complessi.
+
+Vediamo più nel dettaglio Script. Come già detto è turing incompleto. Ad esempio non ci sono loop o flussi di controllo particolarmente complessi. Questo garantisce che un programma non possa mai generare loop infiniti o avere comportamente particolarmente inaspettati. Ad esempio un loop infinito potrebbe causare un attacco dos alla rete (ethereum risolve questo problema con il concetto di gas, ovvero fino a che c'è gas lo script viene eseguito).
+
+Inoltre Script è stateless. Ovvero non c'è uno stato prima dell'esecuzione o dopo l'esecuzione. Questo significa che tutte le informazioni sono contenute nello script. Questo significa che uno script di questo tipo dato un input avrà sempre lo stesso identico output.
+
+Bitcoin si basa su due script per validare una transazione. Il locking script (quello nell'UTXO) e l'unlocking script (quello nell'input).
+
+In particolare il locking script esprime una condizione per la quale un certo output possa essere speso. L'unlocking script invece rappresenta la prova di "spendibilità" di un certo output.
+
+Storicamente il locking script è detto scriptPubKey, perché generalmente contiene una public key o un bitcoin address.
+
+Storicamente l'unlocking script viene detto scriptSig, perché generalmente contiene una firma digitale.
+
+Come si valida quindi una transazione? Si prende l'unlocking script e il locking script, si eseguono in sequenza e si verifica e a quel punto si verifica che l'unlocking script soddisfi le condizioni del locking script.
+
+Il linguaggio Script è detto stack-based, perché usa lo stack come struttura dati. Lo stack permette due operazioni, push e pop. Script è un automa a pila. Lo stack è LIFO, last in, first out.
+
+Ma cosa significa che si basa su una struttura dati? Facciamo un esempio.
+
+L'operazione OP_ADD fa la somma di due numeri. Come la fa? Fa il pop di due oggetti, li somma e fa il push del risultato nello stack.
+
+Ci sono anche operatori condizionali, in particolare OP_EQUAL. OP_EQUAL fa il pop di due oggetti, li compara e infine pusha il risultato (true or false) sullo stack.
+
+
+Ora vediamo un semplice script
+```
+2 3 OP_ADD 5 OP_EQUAL
+```
+
+Questo script fa la somma di due numeri (2 e 3) e successivamente verifica che essi siano uguale a 5.
+
+Essenzialmente tutte le transazioni che dato uno script restituiscono true come risultato sono valide.
+
+Ad esempio, un possibile locking script di un output non speso potrebbe essere questo:
+```
+3 OP_ADD 5 OP_EQUAL
+```
+
+Quale unlocking script può bloccare questo locking script?
+Banalmente 2
+
+Si concatena l'unlocking script e il locking script:
+```
+2 3 OP_ADD 5 OP_EQUAL
+```
+
+Ora chiaramente un locking script così non è particolarmente utile, in quanto chiunque abbia le conoscenze per risolvere un equazione del tipo x+3=5 può sbloccare questo output. La maggior parte delle transazione si basa su uno "script standard" detto P2PKH.
+
+Vediamo nel dettaglio questo script.
+
+Alice deve spedire 0.015 bitcoin a Bob. Alice avrà qualche output bloccato con un P2PKH script che può essere sbloccato presentando una public key e una firma digitale basata sulla corrispondente private key.
+
+Il locking script dell'UTXO di alice sarà di questo tipo:
+```
+OP_DUP OP_HASH160 <BOB Public Key Hash> OP_EQUALVERIFY OP_CHECKSIG
+```
+
+BOB Public Key Hash è equivalente all'address del wallet di bob, senza il base58check encoding.
+
+Questo UTXO può essere sbloccato con un unlocking script di questo tipo:
+
+<BOB Signature> <BOB publick key>
+
+Questo significa che Alice prende la sua chiave privata e ci cripta la public key di bob. Chiunque può decriptare bob signature, perché tutti conoscono la public key di alice, ma solo alice poteva criptarla, perché solo lei conosceva la sua chiave privata. Quindi questa rappresenta una prova del fatto che alice ha deliberatamente deciso di spendere quell'output.
+
+
+## Capitolo 7
