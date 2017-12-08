@@ -93,4 +93,36 @@ Vediamo il funzionamento dello script passo passo:
 	- A questo punto occorre fare il pop degli ultimi 2 PUBLIC_KEY forniti, ma a causa di questo bug in realtà si effettuerà il pop di 3 elementi. Per questo deve essere presente un ulteriore elemento, altrimenti si fa il pop su uno stack vuoto e si restituire un errore. Questo ulteriore valore può essere qualunque cosa, generalmente si opta per lo 0.
 
 
+Facciamo un esempio di caso d'uso della multisignature per capire quanto sia comoda. Mohammed è un importer di oggetti elettronici situato a Dubai. La compagnia di Mohammed usa la multisignature. Questo significa che accetta pagamenti dai clienti solo loccati tramite multisignature. In questo modo tutti gli UTXO ricevuti dai clienti, richiederà almeno due firme digitali per essere sbloccati, una di Mohammed e una dei sue due partner. Questo tutela maggiormente tutti i partner ed evita l'appropriazione indebita.
+
+Sebbene gli script multisignature possano essere molto utili, sono alo stesso tempo molto "pesanti" da utilizzare. Infatti nel precedente caso, Mohammed avrebbe dovuto comunicare a tutti i suoi clienti di utilizzare il suo locking script particolare:
+```
+<PUBLIC_KEY1> <PUBLIC_KEY2> <PUBLIC_KEY3> 3 CHECKMULTISIG
+```
+
+Inoltre i customer avrebbero dovuto usare dei wallet particolari che accettano questo genere di pagamenti, il che risulta tutto molto macchinoso. Inoltre la transazione sarebbe anche particolarmente più grande, il che comporterebbe un maggior costo del fee. Questo genere di problemi viene però risolto con i P2SH.
+
+
 ### Pay-to-Script-Hash (P2PSH)
+I Pay-To-Script-Hash vengono introdotti nel 2012 e rappresentano una terza tipologia di locking script che va a risolvere i problemi precedentemente sollevati con il multisign locking script.
+
+In particolare P2SH è stato sviluppato per rendere difficile usare complessi script quanto effettuare un pagamento a un address bitcoin.
+
+Con P2SH la complessità del locking script viene rimpiazzata con la sua firma digitale, un hash criptografico.
+
+In particolare questo significa che quando qualcuno cercherà di spendere un UTXO, esso dovrò presentare un unlocking script, che oltre all'unlocking script vero e proprio dovrà contenere lo script associato. Questo script associato è riferito al redeem script.
+
+Quindi la multisig senza P2SH funziona così:
+Locking script: 2 <P_KEY1> <P_KEY2> <P_KEY3> 3 CHECKMULTISIG
+Unlocking Script: <SIG1> <SIG2>
+
+
+La multisign con P2SH invece:
+Redeem Script: 2 <P_KEY1> <P_KEY2> <P_KEY3> 3 CHECKMULTISIG
+Locking script: HASH160 <20-byte hash of redeem script> EQUAL
+Unlocking Script: Sig1 Sig2 <REDEEM SCRIPT>
+
+In questo modo il locking script è conciso (meno costo fee), e tutta la complessità viene invece spostata nell'unlocking script. Quindi la complessità e le spese vengono spostate dal cliente al venditore.
+
+Gli indirizzi P2PSH invece di iniziare con il numero 1, iniziano con il numero 3.
+
