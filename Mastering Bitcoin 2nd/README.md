@@ -270,3 +270,18 @@ Questo significa che Alice prende la sua chiave privata e ci cripta la public ke
 
 
 ## Capitolo 7
+Nel precedente capitolo abbiamo visto uno degli script più comuni per bloccare/sbloccare un output, in particolare basato sull'uso di una firma digitale.
+
+Ovvero Alice invia 0.1 BTC a Bob. Alice deve firmare digitalmente con la sua secret key l'address di bob. Esiste anche una versione diversa di questo script, detta Multisignature.
+
+Nella multisignature alice non deve fornire la prova di possedere una chiave privata, ma di più chiavi private.
+
+In particolare si ha uno schema M-of-N. In questo schema significa che ci sono N chiavi private di cui si può certificare il possesso, e se ne devono provare almeno M.
+
+Ovvero, in uno schema 2-of-3 significa che ci sono 3 chiavi private e che si deve provare il possesso di almeno 2 di esse.
+
+A che cosa può servire questa cosa qui, vedi video:
+https://www.youtube.com/watch?v=yeLqe_gg2u0
+
+
+## Capitolo 8
