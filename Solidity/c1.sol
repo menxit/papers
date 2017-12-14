@@ -4,7 +4,7 @@ contract C {
 
 	uint256 a;
 
-	function C() {
+	function C() public {
 		a = 1;
 	}
 

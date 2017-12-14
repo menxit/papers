@@ -5,7 +5,7 @@ contract C {
 	uint128 a;
 	uint128 b;
 
-	function C() {
+	function C() public {
 		a = 1;
 		b = 2;
 	}
